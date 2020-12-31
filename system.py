@@ -40,7 +40,6 @@ class Window:
         self.hidden_x = 0
         self.hidden_y = int(window_size_y) - 40
         self.functions = functions
-
     def redraw(self):
         win = self.win
         if platform.system() != "Windows":
@@ -52,6 +51,12 @@ class Window:
             path_gui_button = path_folder + "/gui/button.png"
             path_gui_textbox = path_folder + "/gui/textbox.png"
             path_gui_hidden_window = path_folder + "/gui/window_icon.png"
+            path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
+            path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
+            path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
+            path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
+            path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
+            path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
         else:
             path_gui_window = path_folder + "\\gui\\window.png"
             path_gui_titlebar = path_folder + "\\gui\\titlebar.png"
@@ -61,7 +66,12 @@ class Window:
             path_gui_button = path_folder + "\\gui\\button.png"
             path_gui_textbox = path_folder + "\\gui\\textbox.png"
             path_gui_hidden_window = path_folder + "\\gui\\window_icon.png"
-
+            path_gui_progressbar_0 = path_folder + "\\gui\\progressbar\\0.png"
+            path_gui_progressbar_20 = path_folder + "\\gui\\progressbar\\20.png"
+            path_gui_progressbar_40 = path_folder + "\\gui\\progressbar\\40.png"
+            path_gui_progressbar_60 = path_folder + "\\gui\\progressbar\\60.png"
+            path_gui_progressbar_80 = path_folder + "\\gui\\progressbar\\80.png"
+            path_gui_progressbar_100 = path_folder + "\\gui\\progressbar\\100.png"
         gui_window = pg.image.load(path_gui_window)
         gui_titlebar = pg.image.load(path_gui_titlebar)
         gui_button_close = pg.image.load(path_gui_button_close)
@@ -76,10 +86,11 @@ class Window:
             for obj in self.objects:
                 if obj[0] == "button":
                     win.blit(pg.transform.scale(gui_button, (obj[4], obj[5])), (obj[2] + self.x, obj[3] + self.y))
-                if obj[0] == "textbox":
+                elif obj[0] == "textbox":
                     win.blit(pg.transform.scale(gui_textbox, (obj[4], obj[5])), (obj[2] + self.x, obj[3] + self.y))
-                object_text = font.render(str(obj[1]), 1, BLACK)
-                win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 5 + self.y])
+                if not(obj[0] == "progressbar"):
+                    object_text = font.render(str(obj[1]), 1, BLACK)
+                    win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 5 + self.y])
             win.blit(pg.transform.scale(gui_titlebar, (self.size_x, 35)), (self.x, self.y))
             if self.closable:
                 win.blit(pg.transform.scale(gui_button_close, (30, 30)), (self.size_x + self.x - 32, self.y + 2))
@@ -91,7 +102,6 @@ class Window:
             win.blit(pg.transform.scale(gui_hidden_window, (90, 90)), (self.hidden_x, self.hidden_y))
             window_title = small_font.render(str(self.title[:9] + "."), 1, WHITE)
             win.blit(window_title, [self.hidden_x + 6, self.hidden_y + 8])
-
 
 def fill_background(path_image, window_x, window_y, window_object):
     iter1 = int(window_x / 60) + 1
@@ -150,10 +160,16 @@ while is_working:
                     cycle = 0
                     tick =0 
                     mode = "shutdown"
+                    appslot2 = ""
+                    appslot3 = ""
+                    appslot4 = ""
                 elif mouse_x >= win_size[0]-80 and mouse_x <= win_size[0]-40 and mouse_y >= win_size[1]-40 and mouse_y <= win_size[1] and mode == "work":
                     cycle = 0
                     tick =0 
-                    mode = "reboot"    
+                    mode = "reboot"
+                    appslot2 = ""
+                    appslot3 = ""
+                    appslot4 = ""    
                 if not current_window.hidden:
                     for obj_id in range(len(current_window.objects)):
                         obj = current_window.objects[obj_id]
