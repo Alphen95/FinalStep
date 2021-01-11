@@ -1,9 +1,11 @@
 import pygame as pg
 from pathlib import Path
-import json
-import platform
+from pprint import pprint
+import json, platform, os
 
 WHITE = (255, 255, 255)
+DARKGRAY = (112, 112, 112)
+LIGHTGRAY = (163, 163, 163)
 BLACK = (0, 0, 0)
 tick = 0
 cycle = 0
@@ -13,20 +15,53 @@ window_moving = False
 busy = False
 mode = "work"
 is_working = True
+dock_hidden = False
 appslot1 = ""
 appslot2 = ""
 appslot3 = ""
 appslot4 = ""
 apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
-current_object = -1
+current_object = ""
 win_size = (600, 300)
-VERSION = "Public Beta 1"
+VERSION = "Public Beta 2"
 VERSION_NAMED = "FinalStep "+VERSION
+path_folder = str(Path().absolute())
+disk_root = os.getcwd()
+if platform.system() != "Windows":
+    path_background = path_folder + "/gui/bgs/bg1.png"
+    path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
+    path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
+    path_gui_button_hidedock = path_folder + "/gui/button_hide_dock.png"
+    path_gui_button_close = path_folder + "/gui/close_button.png"
+    path_gui_button_hide = path_folder + "/gui/hide_button.png"
+    path_gui_font = path_folder + "/gui/pixel_font.ttf"
+    path_gui_hidden_window = path_folder + "/gui/window_icon.png"
+    path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
+    path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
+    path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
+    path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
+    path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
+    path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
+else:
+    path_background = path_folder + "\\gui\\bgs\\bg1.png"
+    path_gui_button_shutdown = path_folder + "\\gui\\button_shutdown.png"
+    path_gui_button_reboot = path_folder + "\\gui\\button_reboot.png"
+    path_gui_button_hidedock = path_folder + "\\gui\\button_hide_dock.png"
+    path_gui_button_close = path_folder + "\\gui\\close_button.png"
+    path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
+    path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
+    path_gui_hidden_window = path_folder + "\\gui\\window_icon.png"
+    path_gui_progressbar_0 = path_folder + "\\gui\\progressbar\\0.png"
+    path_gui_progressbar_20 = path_folder + "\\gui\\progressbar\\20.png"
+    path_gui_progressbar_40 = path_folder + "\\gui\\progressbar\\40.png"
+    path_gui_progressbar_60 = path_folder + "\\gui\\progressbar\\60.png"
+    path_gui_progressbar_80 = path_folder + "\\gui\\progressbar\\80.png"
+    path_gui_progressbar_100 = path_folder + "\\gui\\progressbar\\100.png"
 
 
 class Window:
-    def __init__(self, screen, window_size_y=300, title="", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "action")], size_x=300, size_y=150, hidable=False, closable=True, functions=[()]):
+    def __init__(self, screen, window_size_y=300, title="", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "")], size_x=300, size_y=150, hidable=False, closable=True, functions=[("","")], on_refresh=()):
         self.title = title
         self.x = x
         self.y = y
@@ -40,58 +75,58 @@ class Window:
         self.hidden_x = 0
         self.hidden_y = int(window_size_y) - 40
         self.functions = functions
+        self.on_refresh = on_refresh
     def redraw(self):
         win = self.win
-        if platform.system() != "Windows":
-            path_gui_window = path_folder + "/gui/window.png"
-            path_gui_titlebar = path_folder + "/gui/titlebar.png"
-            path_gui_button_close = path_folder + "/gui/close_button.png"
-            path_gui_button_hide = path_folder + "/gui/hide_button.png"
-            path_gui_font = path_folder + "/gui/pixel_font.ttf"
-            path_gui_button = path_folder + "/gui/button.png"
-            path_gui_textbox = path_folder + "/gui/textbox.png"
-            path_gui_hidden_window = path_folder + "/gui/window_icon.png"
-            path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
-            path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
-            path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
-            path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
-            path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
-            path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
-        else:
-            path_gui_window = path_folder + "\\gui\\window.png"
-            path_gui_titlebar = path_folder + "\\gui\\titlebar.png"
-            path_gui_button_close = path_folder + "\\gui\\close_button.png"
-            path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
-            path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
-            path_gui_button = path_folder + "\\gui\\button.png"
-            path_gui_textbox = path_folder + "\\gui\\textbox.png"
-            path_gui_hidden_window = path_folder + "\\gui\\window_icon.png"
-            path_gui_progressbar_0 = path_folder + "\\gui\\progressbar\\0.png"
-            path_gui_progressbar_20 = path_folder + "\\gui\\progressbar\\20.png"
-            path_gui_progressbar_40 = path_folder + "\\gui\\progressbar\\40.png"
-            path_gui_progressbar_60 = path_folder + "\\gui\\progressbar\\60.png"
-            path_gui_progressbar_80 = path_folder + "\\gui\\progressbar\\80.png"
-            path_gui_progressbar_100 = path_folder + "\\gui\\progressbar\\100.png"
-        gui_window = pg.image.load(path_gui_window)
-        gui_titlebar = pg.image.load(path_gui_titlebar)
         gui_button_close = pg.image.load(path_gui_button_close)
         gui_button_hide = pg.image.load(path_gui_button_hide)
-        gui_button = pg.image.load(path_gui_button)
-        gui_textbox = pg.image.load(path_gui_textbox)
         font = pg.font.Font(path_gui_font, 16)
-        small_font = pg.font.Font(path_gui_font, 16)
+        small_font = pg.font.Font(path_gui_font, 8)
         gui_hidden_window = pg.image.load(path_gui_hidden_window)
         if not self.hidden:
-            win.blit(pg.transform.scale(gui_window, (self.size_x, self.size_y)), (self.x, self.y))
+            pg.draw.rect(win, WHITE, (self.x, self.y, self.size_x, self.size_y))
+            pg.draw.line(win, BLACK, [self.x, self.y + 2], [self.x + self.size_x - 1, self.y + 2], 5)
+            pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y], [self.x + self.size_x - 2, self.y + self.size_y], 5)
+            pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y + self.size_y - 2], [self.x + 2, self.y + self.size_y - 2], 5)
+            pg.draw.line(win, BLACK, [self.x + 2, self.y + 2], [self.x + 2, self.y + self.size_y], 5)
+            if self.on_refresh != ():
+                for action in self.on_refresh:
+                    exec(action)
             for obj in self.objects:
                 if obj[0] == "button":
-                    win.blit(pg.transform.scale(gui_button, (obj[4], obj[5])), (obj[2] + self.x, obj[3] + self.y))
-                elif obj[0] == "textbox":
-                    win.blit(pg.transform.scale(gui_textbox, (obj[4], obj[5])), (obj[2] + self.x, obj[3] + self.y))
-                if not(obj[0] == "progressbar"):
+                    pg.draw.rect(win, LIGHTGRAY, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
+                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y + 2], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y + 2], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y], [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5]], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5] - 2], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + 2, obj[3] + self.y + 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5]], 3)
+                elif obj[0] == "textbox" or obj[0] == "textfield":
+                    pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
+                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y + 2], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y + 2], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y], [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5]], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5] - 2], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + 2, obj[3] + self.y + 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5]], 3)
+                if not(obj[0] == "progressbar" or obj[0] == "textfield"):
                     object_text = font.render(str(obj[1]), 1, BLACK)
                     win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 5 + self.y])
-            win.blit(pg.transform.scale(gui_titlebar, (self.size_x, 35)), (self.x, self.y))
+                elif obj[0] == "textfield":
+                    line = obj[6]
+                    textfield_lines = obj[1]
+                    lines_amount = int((obj[5]-5)/10)
+                    try:
+                        line_num = 0
+                        if int(line) - 1 == -1: add = 1
+                        else: add =0 
+                        for line_id in range(int(line)-1 + add,int(line)+lines_amount-1+add):
+                            line_text = textfield_lines[line_id]
+                            if line_id == line:
+                                object_text = font.render("\u2192" + str(line_text), 1, BLACK)
+                            else:
+                                object_text = font.render(" " + str(line_text), 1, BLACK)
+                            win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 4 + self.y + (10*line_num)])
+                            line_num += 1
+                    except:
+                        pass
+            pg.draw.rect(win, LIGHTGRAY, (self.x, self.y, self.size_x + 1, 35))
             if self.closable:
                 win.blit(pg.transform.scale(gui_button_close, (30, 30)), (self.size_x + self.x - 32, self.y + 2))
             if self.hidable:
@@ -100,7 +135,10 @@ class Window:
             win.blit(window_title, [self.x + 36, self.y + 10])
         else:
             win.blit(pg.transform.scale(gui_hidden_window, (90, 90)), (self.hidden_x, self.hidden_y))
-            window_title = small_font.render(str(self.title[:9] + "."), 1, WHITE)
+            if len(self.title) >= 9:
+                window_title = small_font.render(str(self.title[:9] + "."), 1, WHITE)
+            else:
+                window_title = small_font.render(str(self.title), 1, WHITE)
             win.blit(window_title, [self.hidden_x + 6, self.hidden_y + 8])
 
 def fill_background(path_image, window_x, window_y, window_object):
@@ -112,73 +150,109 @@ def fill_background(path_image, window_x, window_y, window_object):
             window_object.blit(pg.transform.scale(image_gui_background, (60, 60)), (60 * i, 60 * i1))
 
 def fetchapp(filename):
-    path_app = path_folder + filename
+    path_app = os.getcwd() + filename
     with open(path_app, mode="r") as app_file:
         window_arguments = json.loads(app_file.read())
     args_fixed = []
-    for i in range(0, 11):
+    for i in range(0, 12):
         try:
             args_fixed.append(window_arguments[i])
         except:
             args_fixed.append(None)
-    return window, win_size[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10]
+    return window, win_size[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10],args_fixed[11]
 
 mode = "startup"
 clock = pg.time.Clock()
 pg.init()
-path_folder = str(Path().absolute())
 pg.display.set_caption('FinalStep Shell '+VERSION)
-window = pg.display.set_mode((600, 300))
+window = pg.display.set_mode(win_size)
 starting_up = True
-if platform.system() != "Windows":
-    path_background = path_folder + "/gui/bgs/bg1.png"
-    path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
-    path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
-else:
-    path_background = path_folder + "\\gui\\bgs\\bg1.png"
-    path_gui_button_shutdown = path_folder + "\\gui\\button_shutdown.png"
-    path_gui_button_reboot = path_folder + "\\gui\\button_reboot.png"
 
 while is_working:
     pos = pg.mouse.get_pos()
+    if platform.system() != "Windows":
+        path = str(os.getcwd()) + "/"
+    else:
+        path = str(os.getcwd()) + "\\"
     pg.mouse.set_visible(False)
     for event in pg.event.get():
         if event.type == pg.QUIT:
             is_working = False
         elif event.type == pg.KEYDOWN:
-            if current_object != -1 and event.key == pg.K_BACKSPACE or current_object != -1 and event.key == pg.K_DELETE:
-                current_window.objects[current_object][1] = current_window.objects[current_object][1][:-1]
-            elif current_object != -1 and event.key == pg.K_ESCAPE:
-                current_object = -1
-            elif current_object != -1:
-                current_window.objects[current_object][1] += event.unicode
+            if current_object != "":
+                if current_window.objects[current_object][0] == "textbox":
+                    if current_object != -1 and event.key == pg.K_BACKSPACE or current_object != -1 and event.key == pg.K_DELETE:
+                        current_window.objects[current_object][1] = current_window.objects[current_object][1][:-1]
+                    elif current_object != -1 and event.key == pg.K_ESCAPE:
+                        current_object = -1
+                    elif current_object != -1:
+                        current_window.objects[current_object][1] += event.unicode
+                elif current_window.objects[current_object][0] == "textfield":
+                    line = current_window.objects[current_object][-1]
+                    if current_object != "" and event.key == pg.K_BACKSPACE or current_object != "" and event.key == pg.K_DELETE:
+                        try:
+                            if current_window.objects[current_object][1][int(line)] != "":
+                                current_window.objects[current_object][1][int(line)] = current_window.objects[current_object][1][int(line)][:-1]
+                            else:
+                                if line != 0:
+                                    current_window.objects[current_object][1].pop(int(line))
+                                    line -= 1
+                                    current_window.objects[current_object][6] = line
+                                    
+                        except:pass
+                    elif current_object != "" and event.key == pg.K_DOWN:
+                        try:
+                            if current_window.objects[current_object][1][int(line)] != current_window.objects[current_object][1][-1]:
+                                line += 1
+                                current_window.objects[current_object][6] = line
+                        except:
+                            pass
+                    elif current_object != "" and event.key == pg.K_UP:
+                        if line != 0:
+                            line -= 1
+                            current_window.objects[current_object][6] = line
+                    elif current_object != "" and event.key == pg.K_ESCAPE:
+                        current_object = ""
+                    elif current_object != "" and event.key == pg.K_RETURN:
+                        line += 1
+                        current_window.objects[current_object][1].insert(line,"")
+
+                        current_window.objects[current_object][6] = line
+                    elif current_object != "":
+                        current_window.objects[current_object][1][int(line)] += event.unicode
         elif event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
                 mouse_x, mouse_y = event.pos
                 cannot_reselect = False
-                if mouse_x >= win_size[0]-40 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-40 and mouse_y <= win_size[1] and mode == "work":
+                if mouse_x >= win_size[0]-40 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-40 and mouse_y <= win_size[1] and mode == "work" and not dock_hidden:
                     cycle = 0
                     tick =0 
                     mode = "shutdown"
                     appslot2 = ""
                     appslot3 = ""
                     appslot4 = ""
-                elif mouse_x >= win_size[0]-80 and mouse_x <= win_size[0]-40 and mouse_y >= win_size[1]-40 and mouse_y <= win_size[1] and mode == "work":
+                elif mouse_x >= win_size[0]-80 and mouse_x <= win_size[0]-40 and mouse_y >= win_size[1]-40 and mouse_y <= win_size[1] and mode == "work" and not dock_hidden:
                     cycle = 0
                     tick =0 
                     mode = "reboot"
                     appslot2 = ""
                     appslot3 = ""
-                    appslot4 = ""    
+                    appslot4 = ""
+                elif mouse_x >= 0 and mouse_x <= 40 and mouse_y >= win_size[1]-40 and mouse_y <= win_size[1] and mode == "work":
+                    if dock_hidden:
+                        dock_hidden = False
+                    else:
+                        dock_hidden = True
                 if not current_window.hidden:
                     for obj_id in range(len(current_window.objects)):
                         obj = current_window.objects[obj_id]
+                        obj_type = obj[0]
                         x = obj[2] + current_window.x
                         y = obj[3] + current_window.y
                         size_x = obj[4]
                         size_y = obj[5]
                         if mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden:
-                            if obj[0] == "button":
+                            if obj[0] == "button" or obj[0] == "label":
                                 for funct in current_window.functions[obj_id]:
                                     if "fetch" in funct:
                                         if platform.system() != "Windows":
@@ -186,25 +260,25 @@ while is_working:
                                         else:
                                             args_fixed = fetchapp("\\" + funct[6:])
                                         if appslot2 == "":
-                                            appslot2 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10])
-                                            appslot2.hidden_x = 90
+                                            appslot2 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11])
+                                            appslot2.hidden_x = 90+40
                                             current_appslot = 2
                                             current_window = appslot2
                                         elif appslot3 == "":
-                                            appslot3 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10])
-                                            appslot3.hidden_x = 180
+                                            appslot3 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11])
+                                            appslot3.hidden_x = 180+40
                                             current_appslot = 3
                                             current_window = appslot3
                                         elif appslot4 == "":
-                                            appslot4 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10])
-                                            appslot4.hidden_x = 270
+                                            appslot4 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11])
+                                            appslot4.hidden_x = 270+40
                                             current_appslot = 4
                                             current_window = appslot4
                                     else:
                                         exec(funct)
                                     cannot_reselect = True
                                 break
-                            elif mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden and obj[0] == "textbox":
+                            elif obj[0] == "textbox" or obj[0] == "textfield":
                                 current_object = obj_id
                                 cannot_reselect = True
                                 break
@@ -226,7 +300,7 @@ while is_working:
                         current_object = -1
                     current_appslot = 1
                     current_window = appslot1
-                elif mouse_x >= current_window.hidden_x and mouse_x <= current_window.hidden_x + 90 and mouse_y >= current_window.hidden_y and mouse_y <= current_window.hidden_y + 90 and not busy and current_window.hidden and current_window.hidable:
+                elif mouse_x >= current_window.hidden_x and mouse_x <= current_window.hidden_x + 90 and mouse_y >= current_window.hidden_y and mouse_y <= current_window.hidden_y + 90 and not busy and current_window.hidden and current_window.hidable and not dock_hidden:
                     current_window.hidden = False
                 elif mouse_x >= current_window.x and mouse_x <= current_window.x + current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + 40 and not busy and not(mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32):
                     if not window_moving:
@@ -242,7 +316,7 @@ while is_working:
                                 current_appslot = search_window_id + 1
                                 current_object = -1
                                 do_break = True
-                            elif mouse_x >= search_window.hidden_x and mouse_x <= search_window.hidden_x + 90 and mouse_y >= search_window.hidden_y and mouse_y <= search_window.hidden_y + 90 and not busy and search_window.hidden and search_window.hidable and search_window_id + 1 != current_appslot:
+                            elif mouse_x >= search_window.hidden_x and mouse_x <= search_window.hidden_x + 90 and mouse_y >= search_window.hidden_y and mouse_y <= search_window.hidden_y + 90 and not busy and search_window.hidden and search_window.hidable and search_window_id + 1 != current_appslot and not dock_hidden:
                                 search_window.hidden = False
                                 current_object = -1
                                 current_appslot = search_window_id + 1
@@ -269,8 +343,9 @@ while is_working:
             tick = 0
         elif mode == "startup":
             mode = "work"
-            appslot1 = Window(window, win_size[1], "FinalWorkspace "+VERSION, 10, 40, [("button", "Calc.exec", 10, 40, 100, 20)], 300, 170, True, False, [("fetch calc.exec", "")])
+            appslot1 = Window(window, win_size[1], "FinalWorkspace "+VERSION, 10, 40, [], 300, 225, True, False, [("", "")],("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = []\nself.functions = []\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(file):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(file),''))\n    elif os.path.isdir(file):\n        self.functions.append(('os.chdir("'+path+str(file)+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))""",""))
             appslot1.hidden = False
+            appslot1.hidden_x = 40
             current_window = appslot1
         elif mode == "reboot":
             mode = "blackscreen"
@@ -298,15 +373,25 @@ while is_working:
     apps = [appslot1,appslot2,appslot3,appslot4]
     for selected_window in apps:
         try:
-            selected_window.redraw()
+            if dock_hidden and selected_window.hidden:
+                pass
+            else:
+                selected_window.redraw()
         except:
             pass
     if mode == "work":
-        gui_button_shutdown = pg.image.load(path_gui_button_shutdown)
-        window.blit(pg.transform.scale(gui_button_shutdown,(40,40)),(win_size[0]-40,win_size[1]-40))
-        gui_button_reboot = pg.image.load(path_gui_button_reboot)
-        window.blit(pg.transform.scale(gui_button_reboot,(40,40)),(win_size[0]-80,win_size[1]-40))
-    try:current_window.redraw()
+        if not dock_hidden:
+            gui_button_shutdown = pg.image.load(path_gui_button_shutdown)
+            window.blit(pg.transform.scale(gui_button_shutdown,(40,40)),(win_size[0]-40,win_size[1]-40))
+            gui_button_reboot = pg.image.load(path_gui_button_reboot)
+            window.blit(pg.transform.scale(gui_button_reboot,(40,40)),(win_size[0]-80,win_size[1]-40))
+        gui_button_hidedock = pg.image.load(path_gui_button_hidedock)
+        window.blit(pg.transform.scale(gui_button_hidedock,(40,40)),(0,win_size[1]-40))
+    try:
+        if dock_hidden and current_window.hidden:
+                pass
+        else:
+            current_window.redraw()
     except:pass
     if pg.mouse.get_focused():
         pos = pg.mouse.get_pos()
