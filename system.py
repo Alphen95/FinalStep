@@ -141,7 +141,7 @@ class Window:
                 window_title = small_font.render(str(self.title), 1, WHITE)
             win.blit(window_title, [self.hidden_x + 6, self.hidden_y + 8])
 
-def fill_background(path_image, window_x, window_y, window_object):
+def fill_background(path_image, window_x, window_y, window_object) :
     iter1 = int(window_x / 60) + 1
     iter2 = int(window_y / 60) + 1
     image_gui_background = pg.image.load(path_image)
