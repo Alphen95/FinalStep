@@ -81,7 +81,7 @@ class Window:
         gui_button_close = pg.image.load(path_gui_button_close)
         gui_button_hide = pg.image.load(path_gui_button_hide)
         font = pg.font.Font(path_gui_font, 16)
-        small_font = pg.font.Font(path_gui_font, 8)
+        small_font = pg.font.Font(path_gui_font, 16)
         gui_hidden_window = pg.image.load(path_gui_hidden_window)
         if not self.hidden:
             pg.draw.rect(win, WHITE, (self.x, self.y, self.size_x, self.size_y))
