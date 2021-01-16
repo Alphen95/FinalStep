@@ -1,1 +1,1 @@
-["",350,"About",150,50,[["label","About FinalStep",10,50,100,50],["label","a",10,100,100,10],["textfield",["a","a","a","a","b"],10,100,100,50,0]],300,170,true,true,[[""],[""],[""],[""]],["self.objects[1][1] = 'FinalStep version '+VERSION",""]]
+["",350,"About",150,50,[["label","About FinalStep",10,50,100,50],["label","a",10,100,100,10]],300,170,true,true,true,[[""],[""],[""],[""]],["self.objects[1][1] = 'FinalStep version '+VERSION",""]]
