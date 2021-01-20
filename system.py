@@ -4,6 +4,7 @@ from pprint import pprint
 import json
 import platform
 import os
+import shutil
 
 WHITE = (255, 255, 255)
 DARKGRAY = (112, 112, 112)
@@ -26,36 +27,22 @@ apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
 current_object = ""
 win_size = (620, 300)
-VERSION = "Beta 2.1"
+VERSION = "Beta 2.2"
 VERSION_NAMED = "FinalStep " + VERSION
 path_folder = str(Path().absolute())
 disk_root = os.getcwd()
-if platform.system() != "Windows":
-    path_background = path_folder + "/gui/bgs/bg1.png"
-    path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
-    path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
-    path_gui_button_close = path_folder + "/gui/close_button.png"
-    path_gui_button_hide = path_folder + "/gui/hide_button.png"
-    path_gui_font = path_folder + "/gui/pixel_font.ttf"
-    path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
-    path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
-    path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
-    path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
-    path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
-    path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
-else:
-    path_background = path_folder + "\\gui\\bgs\\bg1.png"
-    path_gui_button_shutdown = path_folder + "\\gui\\button_shutdown.png"
-    path_gui_button_reboot = path_folder + "\\gui\\button_reboot.png"
-    path_gui_button_close = path_folder + "\\gui\\close_button.png"
-    path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
-    path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
-    path_gui_progressbar_0 = path_folder + "\\gui\\progressbar\\0.png"
-    path_gui_progressbar_20 = path_folder + "\\gui\\progressbar\\20.png"
-    path_gui_progressbar_40 = path_folder + "\\gui\\progressbar\\40.png"
-    path_gui_progressbar_60 = path_folder + "\\gui\\progressbar\\60.png"
-    path_gui_progressbar_80 = path_folder + "\\gui\\progressbar\\80.png"
-    path_gui_progressbar_100 = path_folder + "\\gui\\progressbar\\100.png"
+path_background = path_folder + "/gui/bgs/bg1.png"
+path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
+path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
+path_gui_button_close = path_folder + "/gui/close_button.png"
+path_gui_button_hide = path_folder + "/gui/hide_button.png"
+path_gui_font = path_folder + "/gui/pixel_font.ttf"
+path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
+path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
+path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
+path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
+path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
+path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
 
 
 class Window:
@@ -170,10 +157,7 @@ starting_up = True
 
 while is_working:
     pos = pg.mouse.get_pos()
-    if platform.system() != "Windows":
-        path = str(os.getcwd()) + "/"
-    else:
-        path = str(os.getcwd()) + "\\"
+    path = str(os.getcwd()) + "/"
     pg.mouse.set_visible(False)
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -271,10 +255,7 @@ while is_working:
                             if obj[0] == "button" or obj[0] == "label":
                                 for funct in current_window.functions[obj_id]:
                                     if "fetch" in funct:
-                                        if platform.system() != "Windows":
-                                            args_fixed = fetchapp("/" + funct[6:])
-                                        else:
-                                            args_fixed = fetchapp("\\" + funct[6:])
+                                        args_fixed = fetchapp("/" + funct[6:])
                                         if appslot2 == "":
                                             appslot2 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
                                             appslot2.hidden_x = 90 + 40
@@ -351,7 +332,7 @@ while is_working:
             tick = 0
         elif mode == "startup":
             mode = "work"
-            appslot1 = Window(window, win_size[1], "FinalWorkspace " + VERSION, 10, 10, [], 300, 225, True, True, False, [("", "")], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = []\nself.functions = []\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(file):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(file),''))\n    elif os.path.isdir(file):\n        self.functions.append(('os.chdir("'+path+str(file)+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))""", ""))
+            appslot1 = Window(window, win_size[1], "FinalWorkspace " + VERSION, 10, 10, [], 300, 225, True, True, False, [[False, ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [('label','',0,0,0,0)]\nself.functions = [self.functions[0]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.functions[0][0] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.functions[0][0]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))\nself.objects.append(('label','Delete',140,200,60,20))\nself.functions.append(('current_window.functions[0][0] = not current_window.functions[0][0]',''))""", ""))
             appslot1.hidden = False
             appslot1.hidden_x = 40
             current_window = appslot1
@@ -412,39 +393,24 @@ while is_working:
     if pg.mouse.get_focused():
         pos = pg.mouse.get_pos()
         if window_moving:
-            if platform.system() != "Windows":
-                path_cursor = path_folder + "/gui/cursor_move.png"
-            else:
-                path_cursor = path_folder + "\\gui\\cursor_move.png"
+            path_cursor = path_folder + "/gui/cursor_move.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
         elif busy:
             if tick <= 30 and tick >= 21:
-                if platform.system() != "Windows":
-                    path_cursor = path_folder + "/gui/cursor_busy2.png"
-                else:
-                    path_cursor = path_folder + "/gui/cursor_busy2.png"
+                ipath_cursor = path_folder + "/gui/cursor_busy2.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             elif tick <= 20 and tick >= 11:
-                if platform.system() != "Windows":
-                    path_cursor = path_folder + "/gui/cursor_busy1.png"
-                else:
-                    path_cursor = path_folder + "/gui/cursor_busy1.png"
+                path_cursor = path_folder + "/gui/cursor_busy1.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             else:
-                if platform.system() != "Windows":
-                    path_cursor = path_folder + "/gui/cursor_busy0.png"
-                else:
-                    path_cursor = path_folder + "/gui/cursor_busy0.png"
+                path_cursor = path_folder + "/gui/cursor_busy0.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
         else:
-            if platform.system() != "Windows":
-                path_cursor = path_folder + "/gui/cursor.png"
-            else:
-                path_cursor = path_folder + "/gui/cursor.png"
+            path_cursor = path_folder + "/gui/cursor.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
     pg.display.update()
