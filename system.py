@@ -27,22 +27,36 @@ apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
 current_object = ""
 win_size = (620, 300)
-VERSION = "Beta 2.2"
+VERSION = "Beta 2.1"
 VERSION_NAMED = "FinalStep " + VERSION
 path_folder = str(Path().absolute())
 disk_root = os.getcwd()
-path_background = path_folder + "/gui/bgs/bg1.png"
-path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
-path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
-path_gui_button_close = path_folder + "/gui/close_button.png"
-path_gui_button_hide = path_folder + "/gui/hide_button.png"
-path_gui_font = path_folder + "/gui/pixel_font.ttf"
-path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
-path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
-path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
-path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
-path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
-path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
+if platform.system() != "Windows":
+    path_background = path_folder + "/gui/bgs/bg1.png"
+    path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
+    path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
+    path_gui_button_close = path_folder + "/gui/close_button.png"
+    path_gui_button_hide = path_folder + "/gui/hide_button.png"
+    path_gui_font = path_folder + "/gui/pixel_font.ttf"
+    path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
+    path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
+    path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
+    path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
+    path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
+    path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
+else:
+    path_background = path_folder + "\\gui\\bgs\\bg1.png"
+    path_gui_button_shutdown = path_folder + "\\gui\\button_shutdown.png"
+    path_gui_button_reboot = path_folder + "\\gui\\button_reboot.png"
+    path_gui_button_close = path_folder + "\\gui\\close_button.png"
+    path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
+    path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
+    path_gui_progressbar_0 = path_folder + "\\gui\\progressbar\\0.png"
+    path_gui_progressbar_20 = path_folder + "\\gui\\progressbar\\20.png"
+    path_gui_progressbar_40 = path_folder + "\\gui\\progressbar\\40.png"
+    path_gui_progressbar_60 = path_folder + "\\gui\\progressbar\\60.png"
+    path_gui_progressbar_80 = path_folder + "\\gui\\progressbar\\80.png"
+    path_gui_progressbar_100 = path_folder + "\\gui\\progressbar\\100.png"
 
 
 class Window:
@@ -157,7 +171,10 @@ starting_up = True
 
 while is_working:
     pos = pg.mouse.get_pos()
-    path = str(os.getcwd()) + "/"
+    if platform.system() != "Windows":
+        path = str(os.getcwd()) + "/"
+    else:
+        path = str(os.getcwd()) + "\\"
     pg.mouse.set_visible(False)
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -255,7 +272,10 @@ while is_working:
                             if obj[0] == "button" or obj[0] == "label":
                                 for funct in current_window.functions[obj_id]:
                                     if "fetch" in funct:
-                                        args_fixed = fetchapp("/" + funct[6:])
+                                        if platform.system() != "Windows":
+                                            args_fixed = fetchapp("/" + funct[6:])
+                                        else:
+                                            args_fixed = fetchapp("\\" + funct[6:])
                                         if appslot2 == "":
                                             appslot2 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
                                             appslot2.hidden_x = 90 + 40
@@ -393,24 +413,39 @@ while is_working:
     if pg.mouse.get_focused():
         pos = pg.mouse.get_pos()
         if window_moving:
-            path_cursor = path_folder + "/gui/cursor_move.png"
+            if platform.system() != "Windows":
+                path_cursor = path_folder + "/gui/cursor_move.png"
+            else:
+                path_cursor = path_folder + "\\gui\\cursor_move.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
         elif busy:
             if tick <= 30 and tick >= 21:
-                ipath_cursor = path_folder + "/gui/cursor_busy2.png"
+                if platform.system() != "Windows":
+                    path_cursor = path_folder + "/gui/cursor_busy2.png"
+                else:
+                    path_cursor = path_folder + "/gui/cursor_busy2.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             elif tick <= 20 and tick >= 11:
-                path_cursor = path_folder + "/gui/cursor_busy1.png"
+                if platform.system() != "Windows":
+                    path_cursor = path_folder + "/gui/cursor_busy1.png"
+                else:
+                    path_cursor = path_folder + "/gui/cursor_busy1.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             else:
-                path_cursor = path_folder + "/gui/cursor_busy0.png"
+                if platform.system() != "Windows":
+                    path_cursor = path_folder + "/gui/cursor_busy0.png"
+                else:
+                    path_cursor = path_folder + "/gui/cursor_busy0.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
         else:
-            path_cursor = path_folder + "/gui/cursor.png"
+            if platform.system() != "Windows":
+                path_cursor = path_folder + "/gui/cursor.png"
+            else:
+                path_cursor = path_folder + "/gui/cursor.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
     pg.display.update()
