@@ -12,6 +12,7 @@ LIGHTGRAY = (163, 163, 163)
 BLACK = (0, 0, 0)
 tick = 0
 cycle = 0
+clicked = False
 offset_x = 0
 offset_y = 0
 window_moving = False
@@ -28,40 +29,23 @@ apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
 current_object = ""
 win_size = (620, 300)
-VERSION = "Beta 2.3"
+VERSION = "Beta 2.4"
 VERSION_NAMED = "FinalStep " + VERSION
 path_folder = str(Path().absolute())
 disk_root = os.getcwd()
 if platform.system() != "Windows":
     path_background = path_folder + "/gui/bgs/bg1.png"
-    path_gui_button_shutdown = path_folder + "/gui/button_shutdown.png"
-    path_gui_button_reboot = path_folder + "/gui/button_reboot.png"
     path_gui_button_close = path_folder + "/gui/close_button.png"
     path_gui_button_hide = path_folder + "/gui/hide_button.png"
     path_gui_font = path_folder + "/gui/pixel_font.ttf"
-    path_gui_progressbar_0 = path_folder + "/gui/progressbar/0.png"
-    path_gui_progressbar_20 = path_folder + "/gui/progressbar/20.png"
-    path_gui_progressbar_40 = path_folder + "/gui/progressbar/40.png"
-    path_gui_progressbar_60 = path_folder + "/gui/progressbar/60.png"
-    path_gui_progressbar_80 = path_folder + "/gui/progressbar/80.png"
-    path_gui_progressbar_100 = path_folder + "/gui/progressbar/100.png"
 else:
     path_background = path_folder + "\\gui\\bgs\\bg1.png"
-    path_gui_button_shutdown = path_folder + "\\gui\\button_shutdown.png"
-    path_gui_button_reboot = path_folder + "\\gui\\button_reboot.png"
     path_gui_button_close = path_folder + "\\gui\\close_button.png"
     path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
     path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
-    path_gui_progressbar_0 = path_folder + "\\gui\\progressbar\\0.png"
-    path_gui_progressbar_20 = path_folder + "\\gui\\progressbar\\20.png"
-    path_gui_progressbar_40 = path_folder + "\\gui\\progressbar\\40.png"
-    path_gui_progressbar_60 = path_folder + "\\gui\\progressbar\\60.png"
-    path_gui_progressbar_80 = path_folder + "\\gui\\progressbar\\80.png"
-    path_gui_progressbar_100 = path_folder + "\\gui\\progressbar\\100.png"
-
 
 class Window:
-    def __init__(self, screen, window_size_y=300, title="", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "")], size_x=300, size_y=150, hidable=False, has_titlebar=True, closable=True, functions=[("", "")], on_refresh=()):
+    def __init__(self, screen, window_size_y=300, title="Window", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "")], size_x=300, size_y=150, hidable=False, has_titlebar=True, closable=True, functions=[("", "")], on_refresh=()):
         self.title = title
         self.x = x
         self.y = y
@@ -95,11 +79,11 @@ class Window:
                     exec(action)
             for obj in self.objects:
                 if obj[0] == "button":
-                    pg.draw.rect(win, LIGHTGRAY, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
-                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
+                    pg.draw.rect(win, DARKGRAY, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
+                    pg.draw.line(win, LIGHTGRAY, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y], [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5] - 2], 3)
-                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 2], [obj[2] + self.x, obj[3] + self.y + obj[5] - 1], 3)
+                    pg.draw.line(win, LIGHTGRAY, [obj[2] + self.x, obj[3] + self.y - 2], [obj[2] + self.x, obj[3] + self.y + obj[5] - 1], 3)
                 elif obj[0] == "textbox" or obj[0] == "textfield":
                     pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
@@ -107,6 +91,8 @@ class Window:
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 1, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 1, obj[3] + self.y + obj[5] - 2], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + 1, obj[3] + self.y - 2], [obj[2] + self.x + 1, obj[3] + self.y + obj[5] - 1], 3)
                 elif obj[0] == "checkbox":
+                    obj[4] = 15
+                    obj[5] = 15
                     pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + 15,obj[3] + self.y - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + 15,obj[3] + self.y - 2], [obj[2] + self.x + 15,obj[3] + self.y +15], 3)
@@ -187,6 +173,8 @@ while is_working:
         path = str(os.getcwd()) + "\\"
     pg.mouse.set_visible(False)
     for event in pg.event.get():
+        if event.type == pg.MOUSEBUTTONDOWN and pg.mouse.get_focused(): clicked = True
+        elif event.type == pg.MOUSEBUTTONUP: clicked = False
         if event.type == pg.QUIT:
             is_working = False
         elif event.type == pg.KEYDOWN:
@@ -232,123 +220,119 @@ while is_working:
                         current_window.objects[current_object][6] = line
                     elif current_object != "":
                         current_window.objects[current_object][1][int(line)] += event.unicode
-        elif event.type == pg.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                mouse_x, mouse_y = event.pos
-                cannot_reselect = False
-                if mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
-                    cycle = 0
-                    tick = 0
-                    mode = "reboot"
-                    appslot2 = ""
-                    appslot3 = ""
-                    appslot4 = ""
-                if mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-25 and mouse_y <= win_size[1] and mode == "work":
-                    cycle = 0
-                    tick = 0
-                    mode = "shutdown"
-                    appslot2 = ""
-                    appslot3 = ""
-                    appslot4 = ""
-                if mouse_x >= 90 and mouse_x <= 199 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
-                    current_appslot = 1
-                    current_window = appslot1
-                    current_object = ""
-                    appslot1.hidden = False
-                if mouse_x >= 200 and mouse_x <= 309 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and appslot2 != "":
-                    current_appslot = 2
-                    current_window = appslot2
-                    current_object = ""
-                    appslot2.hidden = False
-                if mouse_x >= 310 and mouse_x <= 419 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and appslot3 != "":
-                    current_appslot = 3
-                    current_window = appslot3
-                    current_object = ""
-                    appslot3.hidden = False
-                if mouse_x >= 420 and mouse_x <= 529 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and appslot4 != "":
-                    current_appslot = 4
-                    current_window = appslot4
-                    current_object = ""
-                    appslot4.hidden = False
-                if not current_window.hidden:
-                    for obj_id in range(len(current_window.objects)):
-                        obj = current_window.objects[obj_id]
-                        obj_type = obj[0]
-                        x = obj[2] + current_window.x
-                        y = obj[3] + current_window.y
-                        size_x = obj[4]
-                        size_y = obj[5]
-                        if mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden:
-                            if obj[0] == "button" or obj[0] == "label":
-                                print("a")
-                                for funct in current_window.functions[obj_id]:
-                                    if "fetch" in funct:
-                                        if platform.system() != "Windows":
-                                            args_fixed = fetchapp("/" + funct[6:])
-                                        else:
-                                            args_fixed = fetchapp("\\" + funct[6:])
-                                        if appslot2 == "":
-                                            appslot2 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
-                                            appslot2.hidden_x = 90 + 40
-                                            current_appslot = 2
-                                            current_window = appslot2
-                                        elif appslot3 == "":
-                                            appslot3 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
-                                            appslot3.hidden_x = 180 + 40
-                                            current_appslot = 3
-                                            current_window = appslot3
-                                        elif appslot4 == "":
-                                            appslot4 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
-                                            appslot4.hidden_x = 270 + 40
-                                            current_appslot = 4
-                                            current_window = appslot4
+        elif clicked:
+            mouse_x = pos[0]
+            mouse_y = pos[1]
+            cannot_reselect = False
+            if mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
+                cycle = 0
+                tick = 0
+                mode = "reboot"
+                appslot2 = ""
+                appslot3 = ""
+                appslot4 = ""
+            if mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-25 and mouse_y <= win_size[1] and mode == "work":
+                cycle = 0
+                tick = 0
+                mode = "shutdown"
+                appslot2 = ""
+                appslot3 = ""
+                appslot4 = ""
+            if mouse_x >= 90 and mouse_x <= 199 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
+                current_appslot = 1
+                current_window = appslot1
+                current_object = ""
+                appslot1.hidden = False
+            if mouse_x >= 200 and mouse_x <= 309 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and appslot2 != "":
+                current_appslot = 2
+                current_window = appslot2
+                current_object = ""
+                appslot2.hidden = False
+            if mouse_x >= 310 and mouse_x <= 419 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and appslot3 != "":
+                current_appslot = 3
+                current_window = appslot3
+                current_object = ""
+                appslot3.hidden = False
+            if mouse_x >= 420 and mouse_x <= 529 and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and appslot4 != "":
+                current_appslot = 4
+                current_window = appslot4
+                current_object = ""
+                appslot4.hidden = False
+            if not current_window.hidden:
+                for obj_id in range(len(current_window.objects)):
+                    obj = current_window.objects[obj_id]
+                    obj_type = obj[0]
+                    x = obj[2] + current_window.x
+                    y = obj[3] + current_window.y
+                    size_x = obj[4]
+                    size_y = obj[5]
+                    if mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden:
+                        if obj[0] == "button" or obj[0] == "label":
+                            for funct in current_window.functions[obj_id]:
+                                if "fetch" in funct:
+                                    if platform.system() != "Windows":
+                                        args_fixed = fetchapp("/" + funct[6:])
                                     else:
-                                        exec(funct)
-                                    cannot_reselect = True
-                                break
-                            elif obj[0] == "textbox" or obj[0] == "textfield":
-                                current_object = obj_id
+                                        args_fixed = fetchapp("\\" + funct[6:])
+                                    if appslot2 == "":
+                                        appslot2 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
+                                        appslot2.hidden_x = 90 + 40
+                                        current_appslot = 2
+                                        current_window = appslot2
+                                    elif appslot3 == "":
+                                        appslot3 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
+                                        appslot3.hidden_x = 180 + 40
+                                        current_appslot = 3
+                                        current_window = appslot3
+                                    elif appslot4 == "":
+                                        appslot4 = Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12])
+                                        appslot4.hidden_x = 270 + 40
+                                        current_appslot = 4
+                                        current_window = appslot4
+                                else:
+                                    exec(funct)
                                 cannot_reselect = True
-                                break
-                            elif obj[0] == "checkbox":
-                                obj[1] = not obj[1]
-                                cannot_reselect = True
-                                break                            
-                if window_moving:
-                    window_moving = False
-                    current_window.x = mouse_x
-                    current_window.y = mouse_y
-                elif mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and not busy and not current_window.hidden and current_window.hidable:
-                    current_window.hidden = True
-                elif mouse_x <= current_window.x + current_window.size_x - 2 and mouse_x >= current_window.x + current_window.size_x - 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and current_window.closable and not busy and not current_window.hidden:
-                    if current_appslot == 2:
-                        appslot2 = ""
-                        current_object = -1
-                    elif current_appslot == 3:
-                        appslot3 = ""
-                        current_object = -1
-                    elif current_appslot == 4:
-                        appslot4 = ""
-                        current_object = -1
-                    current_appslot = 1
-                    current_window = appslot1
-                elif mouse_x >= current_window.x and mouse_x <= current_window.x + current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + 40 and not busy and not(mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32):
-                    if not window_moving:
-                        window_moving = True
-                apps = [appslot1, appslot2, appslot3, appslot4]
-                if not cannot_reselect:
-                    for search_window_id in range(len(apps)):
-                        search_window = apps[search_window_id]
-                        do_break = False
-                        if search_window != "":
-                            if mouse_x >= search_window.x and mouse_x <= search_window.x + search_window.size_x and mouse_y >= search_window.y and mouse_y <= search_window.y + search_window.size_y and search_window_id + 1 != current_appslot and not search_window.hidden and not(mouse_x >= current_window.x and mouse_x <= current_window.x +current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + current_window.size_y):
-                                current_window = search_window
-                                current_appslot = search_window_id + 1
-                                current_object = -1
-                                do_break = True
-                        if do_break:
                             break
-                cannot_reselect = False
+                        elif obj[0] == "textbox" or obj[0] == "textfield":
+                            current_object = obj_id
+                            cannot_reselect = True
+                            break
+                        elif obj[0] == "checkbox":
+                            obj[1] = not obj[1]
+                            cannot_reselect = True
+                            break                            
+            if mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and not busy and not current_window.hidden and current_window.hidable:
+                current_window.hidden = True
+            elif mouse_x <= current_window.x + current_window.size_x - 2 and mouse_x >= current_window.x + current_window.size_x - 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and current_window.closable and not busy and not current_window.hidden:
+                if current_appslot == 2:
+                    appslot2 = ""
+                    current_object = -1
+                elif current_appslot == 3:
+                    appslot3 = ""
+                    current_object = -1
+                elif current_appslot == 4:
+                    appslot4 = ""
+                    current_object = -1
+                current_appslot = 1
+                current_window = appslot1
+            elif mouse_x >= current_window.x and mouse_x <= current_window.x + current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + 40 and not busy and not(mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32):
+                current_window.x = mouse_x - (current_window.size_x / 2)
+                current_window.y = mouse_y - 17
+                window_moving = True
+            apps = [appslot1, appslot2, appslot3, appslot4]
+            if not cannot_reselect:
+                for search_window_id in range(len(apps)):
+                    search_window = apps[search_window_id]
+                    do_break = False
+                    if search_window != "":
+                        if mouse_x >= search_window.x and mouse_x <= search_window.x + search_window.size_x and mouse_y >= search_window.y and mouse_y <= search_window.y + search_window.size_y and search_window_id + 1 != current_appslot and not search_window.hidden and not(mouse_x >= current_window.x and mouse_x <= current_window.x +current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + current_window.size_y):
+                            current_window = search_window
+                            current_appslot = search_window_id + 1
+                            current_object = -1
+                            do_break = True
+                    if do_break:
+                        break
+            cannot_reselect = False
     clock.tick(30)
     tick += 1
     if tick == 31:
@@ -367,7 +351,7 @@ while is_working:
             tick = 0
         elif mode == "startup":
             mode = "work"
-            appslot1 = Window(window, win_size[1], "FinalWorkspace " + VERSION, 10, 10, [["checkbox",False,120,200,15,15]], 300, 225, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0]]\nself.functions = [['','']]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,10))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))""", ""))
+            appslot1 = Window(window, win_size[1], "fFiles " + VERSION, 10, 10, [["checkbox",False,190,204,15,15]], 300, 225, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0],["label","Delete:",120,200,0,0]]\nself.functions = [['',''],["",""]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,10))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))""", ""))
             appslot1.hidden = False
             appslot1.hidden_x = 40
             current_window = appslot1
