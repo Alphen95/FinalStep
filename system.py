@@ -23,11 +23,12 @@ appslot1 = ""
 appslot2 = ""
 appslot3 = ""
 appslot4 = ""
+splitter = "\n"
 apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
 current_object = ""
 win_size = (620, 300)
-VERSION = "Beta 2.1"
+VERSION = "Beta 2.3"
 VERSION_NAMED = "FinalStep " + VERSION
 path_folder = str(Path().absolute())
 disk_root = os.getcwd()
@@ -105,9 +106,18 @@ class Window:
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y], [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 1, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 1, obj[3] + self.y + obj[5] - 2], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + 1, obj[3] + self.y - 2], [obj[2] + self.x + 1, obj[3] + self.y + obj[5] - 1], 3)
+                elif obj[0] == "checkbox":
+                    pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
+                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + 15,obj[3] + self.y - 1], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + 15,obj[3] + self.y - 2], [obj[2] + self.x + 15,obj[3] + self.y +15], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x + 15,obj[3] + self.y +14], [obj[2] + self.x + 1, obj[3] + self.y +14], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y-2 ],[obj[2] + self.x , obj[3] + self.y +15], 3)
+                    if obj[1]:
+                        pg.draw.line(win, BLACK, [obj[2] + self.x +4, obj[3] + self.y +7], [obj[2] + self.x + 8,obj[3] + self.y + 10], 3)
+                        pg.draw.line(win, BLACK, [obj[2] + self.x + 8,obj[3] + self.y + 10], [obj[2] + self.x + 11,obj[3] + self.y + 2], 3)
                 elif obj[0] == "line":
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y], [obj[4]+ self.x, obj[5]+ self.y], 3)
-                if not(obj[0] == "progressbar" or obj[0] == "textfield"):
+                if not(obj[0] == "progressbar" or obj[0] == "textfield" or obj[0] == "checkbox"):
                     object_text = font.render(str(obj[1]), 1, BLACK)
                     win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 5 + self.y])
                 elif obj[0] == "textfield":
@@ -270,6 +280,7 @@ while is_working:
                         size_y = obj[5]
                         if mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden:
                             if obj[0] == "button" or obj[0] == "label":
+                                print("a")
                                 for funct in current_window.functions[obj_id]:
                                     if "fetch" in funct:
                                         if platform.system() != "Windows":
@@ -299,6 +310,10 @@ while is_working:
                                 current_object = obj_id
                                 cannot_reselect = True
                                 break
+                            elif obj[0] == "checkbox":
+                                obj[1] = not obj[1]
+                                cannot_reselect = True
+                                break                            
                 if window_moving:
                     window_moving = False
                     current_window.x = mouse_x
@@ -352,7 +367,7 @@ while is_working:
             tick = 0
         elif mode == "startup":
             mode = "work"
-            appslot1 = Window(window, win_size[1], "FinalWorkspace " + VERSION, 10, 10, [], 300, 225, True, True, False, [[False, ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [('label','',0,0,0,0)]\nself.functions = [self.functions[0]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.functions[0][0] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.functions[0][0]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))\nself.objects.append(('label','Delete',140,200,60,20))\nself.functions.append(('current_window.functions[0][0] = not current_window.functions[0][0]',''))""", ""))
+            appslot1 = Window(window, win_size[1], "FinalWorkspace " + VERSION, 10, 10, [["checkbox",False,120,200,15,15]], 300, 225, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0]]\nself.functions = [['','']]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',''))\nself.objects.append(('label','/',75,200,10,10))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))""", ""))
             appslot1.hidden = False
             appslot1.hidden_x = 40
             current_window = appslot1
