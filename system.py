@@ -103,7 +103,10 @@ class Window:
                         pg.draw.line(win, BLACK, [obj[2] + self.x + 8,obj[3] + self.y + 10], [obj[2] + self.x + 11,obj[3] + self.y + 2], 3)
                 elif obj[0] == "line":
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y], [obj[4]+ self.x, obj[5]+ self.y], 3)
-                if not(obj[0] == "progressbar" or obj[0] == "textfield" or obj[0] == "checkbox"):
+                elif obj[0] == "image":
+                    image_gui = pg.image.load(path_folder+obj[1])
+                    win.blit(pg.transform.scale(image_gui, (obj[4], obj[5])), (self.x+obj[2], self.y+obj[3]))
+                if not(obj[0] == "progressbar" or obj[0] == "textfield" or obj[0] == "checkbox" or obj[0] == "image"):
                     object_text = font.render(str(obj[1]), 1, BLACK)
                     win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 5 + self.y])
                 elif obj[0] == "textfield":
@@ -418,6 +421,7 @@ while is_working:
                 path_cursor = path_folder + "\\gui\\cursor_move.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
+            window_moving = False 
         elif busy:
             if tick <= 30 and tick >= 21:
                 if platform.system() != "Windows":

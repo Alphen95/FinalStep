@@ -1,0 +1,1 @@
+["",350,"fClock",150,50,[["image","/gui/fclock_bg.png",0,35,128,128],["label","a",25,99,100,10]],128,163,true,true,true,[[""],[""],[""],[""]],["from datetime import datetime\ntime = str(datetime.now().time())\nself.objects[1][1] = time[:5]",""]]
