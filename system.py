@@ -29,7 +29,7 @@ apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
 current_object = ""
 win_size = (620, 300)
-VERSION = "Beta 2.4.1"
+VERSION = "Beta 3"
 VERSION_NAMED = "FinalStep " + VERSION
 path_folder = str(Path().absolute())
 disk_root = os.getcwd()
@@ -38,14 +38,16 @@ if platform.system() != "Windows":
     path_gui_button_close = path_folder + "/gui/close_button.png"
     path_gui_button_hide = path_folder + "/gui/hide_button.png"
     path_gui_font = path_folder + "/gui/pixel_font.ttf"
+    path_icon = path_folder + "/gui/logo.png"
 else:
     path_background = path_folder + "\\gui\\bgs\\bg1.png"
     path_gui_button_close = path_folder + "\\gui\\close_button.png"
     path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
     path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
+    path_icon = path_folder + "\\gui\\logo.png"
 
 class Window:
-    def __init__(self, screen, window_size_y=300, title="Window", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "")], size_x=300, size_y=150, hidable=False, has_titlebar=True, closable=True, functions=[("", "")], on_refresh=()):
+    def __init__(self, screen, window_size_y=300, title="Window", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "")], size_x=300, size_y=150, hidable=False, has_titlebar=True, closable=True, functions=[("", "")], on_refresh=(),color = (255,255,255), border = True):
         self.title = title
         self.x = x
         self.y = y
@@ -61,6 +63,8 @@ class Window:
         self.functions = functions
         self.on_refresh = on_refresh
         self.has_titlebar = has_titlebar
+        self.color = color
+        self.border = border
 
     def redraw(self):
         win = self.win
@@ -69,21 +73,22 @@ class Window:
         font = pg.font.Font(path_gui_font, 16)
         small_font = pg.font.Font(path_gui_font, 16)
         if not self.hidden:
-            pg.draw.rect(win, WHITE, (self.x, self.y, self.size_x, self.size_y))
-            pg.draw.line(win, BLACK, [self.x, self.y + 2], [self.x + self.size_x - 1, self.y + 2], 5)
-            pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y], [self.x + self.size_x - 2, self.y + self.size_y], 5)
-            pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y + self.size_y - 2], [self.x + 2, self.y + self.size_y - 2], 5)
-            pg.draw.line(win, BLACK, [self.x + 2, self.y + 2], [self.x + 2, self.y + self.size_y], 5)
+            pg.draw.rect(win, self.color, (self.x, self.y, self.size_x, self.size_y))
+            if self.border:
+                pg.draw.line(win, BLACK, [self.x, self.y + 2], [self.x + self.size_x - 1, self.y + 2], 5)
+                pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y], [self.x + self.size_x - 2, self.y + self.size_y], 5)
+                pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y + self.size_y - 2], [self.x + 2, self.y + self.size_y - 2], 5)
+                pg.draw.line(win, BLACK, [self.x + 2, self.y + 2], [self.x + 2, self.y + self.size_y], 5)                
             if self.on_refresh != ():
                 for action in self.on_refresh:
                     exec(action)
             for obj in self.objects:
                 if obj[0] == "button":
                     pg.draw.rect(win, DARKGRAY, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
-                    pg.draw.line(win, LIGHTGRAY, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y], [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5] - 2], 3)
-                    pg.draw.line(win, LIGHTGRAY, [obj[2] + self.x, obj[3] + self.y - 2], [obj[2] + self.x, obj[3] + self.y + obj[5] - 1], 3)
+                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 2], [obj[2] + self.x, obj[3] + self.y + obj[5] - 1], 3)
                 elif obj[0] == "textbox" or obj[0] == "textfield":
                     pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
@@ -165,6 +170,8 @@ mode = "startup"
 clock = pg.time.Clock()
 pg.init()
 pg.display.set_caption('FinalStep Shell ' + VERSION)
+icon = pg.image.load(path_icon)
+pg.display.set_icon(icon)
 window = pg.display.set_mode(win_size)
 starting_up = True
 
@@ -354,7 +361,7 @@ while is_working:
             tick = 0
         elif mode == "startup":
             mode = "work"
-            appslot1 = Window(window, win_size[1], "fFiles " + VERSION, 10, 10, [["checkbox",False,190,204,15,15]], 300, 225, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0],["label","Delete:",120,200,0,0]]\nself.functions = [['',''],["",""]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',' '))\nself.objects.append(('label','/',75,200,20,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(('os.chdir("..")',''))""", ""))
+            appslot1 = Window(window, win_size[1], "fFiles " + VERSION, 10, 10, [["checkbox",False,190,204,15,15]], 300, 235, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0],["label","Delete:",120,200,0,0]]\nself.functions = [['',''],["",""]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',' '))\nself.objects.append(('label','/',75,200,20,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(( 'os.chdir("..")',''))\nself.objects.append(('label','Root:'+str(path[len(disk_root):]),10,213,20,20))\nself.functions.append(('',''))""", ""))
             appslot1.hidden = False
             appslot1.hidden_x = 40
             current_window = appslot1
@@ -403,7 +410,7 @@ while is_working:
                 appbuttons.append(["button", "4 "+appslot4.title[:9], 420, 2, 110, 25])
             appbuttons = [["label", "FinalStep", 5, 5, 100, 50],["label", VERSION, 3, 20, 100, 50],["button", "Reboot", win_size[0]-90, 2, 90, 25],["button", "Shutdown", win_size[0]-90, 27, 90, 25]]+appbuttons
             appfunctions = [[],[],["""cycle = 0\ntick = 0\nmode = "reboot"\nappslot2 = ""\nappslot3 = ""\nappslot4 = "" """,""],["""cycle = 0\ntick = 0\nmode = "shutdown"\nappslot2 = ""\nappslot3 = ""\nappslot4 = "" """,""]]
-            dock_window = Window(window, win_size[1], "", 0, 250, appbuttons, win_size[0], 50, False, False, False,appfunctions)
+            dock_window = Window(window, win_size[1], "", 0, 250, appbuttons, win_size[0], 50, False, False, False,appfunctions,("",""),LIGHTGRAY,False)
             dock_window.redraw()            
     try:
         if dock_hidden and current_window.hidden:
