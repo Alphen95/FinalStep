@@ -1,5 +1,5 @@
 import pygame as pg
-from pathlib import Path
+import pathlib
 from pprint import pprint
 import json
 import platform
@@ -19,32 +19,31 @@ window_moving = False
 busy = False
 mode = "work"
 is_working = True
+window_indent = -1
 dock_hidden = False
 appslot1 = ""
 appslot2 = ""
 appslot3 = ""
 appslot4 = ""
 splitter = "\n"
+crt_tick = -31
+display_prefs = [False,"/BGs/default.png",False]
 apps = [appslot1, appslot2, appslot3, appslot4]
 current_appslot = 1
 current_object = ""
-win_size = (620, 300)
-VERSION = "Beta 3"
+win_size = (800, 600)
+VERSION = "Beta 3.1"
 VERSION_NAMED = "FinalStep " + VERSION
-path_folder = str(Path().absolute())
-disk_root = os.getcwd()
-if platform.system() != "Windows":
-    path_background = path_folder + "/gui/bgs/bg1.png"
-    path_gui_button_close = path_folder + "/gui/close_button.png"
-    path_gui_button_hide = path_folder + "/gui/hide_button.png"
-    path_gui_font = path_folder + "/gui/pixel_font.ttf"
-    path_icon = path_folder + "/gui/logo.png"
-else:
-    path_background = path_folder + "\\gui\\bgs\\bg1.png"
-    path_gui_button_close = path_folder + "\\gui\\close_button.png"
-    path_gui_button_hide = path_folder + "\\gui\\hide_button.png"
-    path_gui_font = path_folder + "\\gui\\pixel_font.ttf"
-    path_icon = path_folder + "\\gui\\logo.png"
+path_folder = str(pathlib.Path(__file__).parent.absolute())
+disk_root = str(pathlib.Path(__file__).parent.absolute())
+os.chdir(disk_root)
+path_folder = path_folder.replace("\\","/")
+path_gui_button_close = path_folder + "/gui/close_button.png"
+path_gui_button_hide = path_folder + "/gui/hide_button.png"
+path_gui_font = path_folder + "/gui/pixel_font.ttf"
+path_icon = path_folder + "/gui/logo.png"
+path_overlay2 = path_folder + "/gui/overlay_crt_scanlines.png"
+path_overlay1 = path_folder + "/gui/overlay_crt_line.png"
 
 class Window:
     def __init__(self, screen, window_size_y=300, title="Window", x=50, y=50, objects=[("label", "", 0, 0, 100, 40, "")], size_x=300, size_y=150, hidable=False, has_titlebar=True, closable=True, functions=[("", "")], on_refresh=(),color = (255,255,255), border = True):
@@ -90,7 +89,7 @@ class Window:
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 2, obj[3] + self.y + obj[5] - 2], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 2], [obj[2] + self.x, obj[3] + self.y + obj[5] - 1], 3)
                 elif obj[0] == "textbox" or obj[0] == "textfield":
-                    pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
+                    pg.draw.rect(win, WHITE, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5])) 
                     pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y - 1], [obj[2] + self.x + obj[4] - 1, obj[3] + self.y - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 2, obj[3] + self.y], [obj[2] + self.x + obj[4] - 2, obj[3] + self.y + obj[5] - 1], 3)
                     pg.draw.line(win, BLACK, [obj[2] + self.x + obj[4] - 1, obj[3] + self.y + obj[5] - 2], [obj[2] + self.x + 1, obj[3] + self.y + obj[5] - 2], 3)
@@ -113,7 +112,7 @@ class Window:
                     win.blit(pg.transform.scale(image_gui, (obj[4], obj[5])), (self.x+obj[2], self.y+obj[3]))
                 if not(obj[0] == "progressbar" or obj[0] == "textfield" or obj[0] == "checkbox" or obj[0] == "image"):
                     object_text = font.render(str(obj[1]), 1, BLACK)
-                    win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 5 + self.y])
+                    win.blit(object_text, [obj[2] + 2 + self.x, obj[3] + 2 + self.y])
                 elif obj[0] == "textfield":
                     line = obj[6]
                     textfield_lines = obj[1]
@@ -147,10 +146,12 @@ class Window:
 def fill_background(path_image, window_x, window_y, window_object):
     iter1 = int(window_x / 60) + 1
     iter2 = int(window_y / 60) + 1
-    image_gui_background = pg.image.load(path_image)
-    for i in range(0, iter1):
-        for i1 in range(0, iter2):
-            window_object.blit(pg.transform.scale(image_gui_background, (60, 60)), (60 * i, 60 * i1))
+    try:
+        image_gui_background = pg.image.load(path_image)
+        for i in range(0, iter1):
+            for i1 in range(0, iter2):
+                window_object.blit(pg.transform.scale(image_gui_background, (60, 60)), (60 * i, 60 * i1))
+    except: pass
 
 
 def fetchapp(filename):
@@ -169,18 +170,24 @@ def fetchapp(filename):
 mode = "startup"
 clock = pg.time.Clock()
 pg.init()
-pg.display.set_caption('FinalStep Shell ' + VERSION)
+pg.display.set_caption('FinalStep ' + VERSION)
 icon = pg.image.load(path_icon)
 pg.display.set_icon(icon)
 window = pg.display.set_mode(win_size)
 starting_up = True
+crt_overlay1= pg.image.load(path_overlay1)
+crt_overlay2= pg.image.load(path_overlay2)
+try:
+    with open("preferences.json",mode="r") as file:
+        display_prefs = json.loads(file.read())
+except:
+    with open("preferences.json",mode="w+") as file:
+        file.write(json.dumps(display_prefs))
 
 while is_working:
     pos = pg.mouse.get_pos()
-    if platform.system() != "Windows":
-        path = str(os.getcwd()) + "/"
-    else:
-        path = str(os.getcwd()) + "\\"
+    path = str(os.getcwd()) + "/"
+    path = path.replace("\\","/")
     pg.mouse.set_visible(False)
     for event in pg.event.get():
         if event.type == pg.MOUSEBUTTONDOWN and pg.mouse.get_focused(): clicked = True
@@ -276,7 +283,7 @@ while is_working:
                     y = obj[3] + current_window.y
                     size_x = obj[4]
                     size_y = obj[5]
-                    if mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden:
+                    if mouse_x >= x and mouse_x <= x + size_x and mouse_y >= y and mouse_y <= y + size_y and not current_window.hidden and not window_moving:
                         if obj[0] == "button" or obj[0] == "label":
                             for funct in current_window.functions[obj_id]:
                                 if "fetch" in funct:
@@ -311,7 +318,7 @@ while is_working:
                             obj[1] = not obj[1]
                             cannot_reselect = True
                             break                            
-            if mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and not busy and not current_window.hidden and current_window.hidable:
+            if mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and not busy and not current_window.hidden and current_window.hidable and not window_moving:
                 current_window.hidden = True
             elif mouse_x <= current_window.x + current_window.size_x - 2 and mouse_x >= current_window.x + current_window.size_x - 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32 and current_window.closable and not busy and not current_window.hidden:
                 if current_appslot == 2:
@@ -326,8 +333,6 @@ while is_working:
                 current_appslot = 1
                 current_window = appslot1
             elif mouse_x >= current_window.x and mouse_x <= current_window.x + current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + 40 and not busy and not(mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32):
-                current_window.x = mouse_x - (current_window.size_x / 2)
-                current_window.y = mouse_y - 17
                 window_moving = True
             apps = [appslot1, appslot2, appslot3, appslot4]
             if not cannot_reselect:
@@ -335,7 +340,7 @@ while is_working:
                     search_window = apps[search_window_id]
                     do_break = False
                     if search_window != "":
-                        if mouse_x >= search_window.x and mouse_x <= search_window.x + search_window.size_x and mouse_y >= search_window.y and mouse_y <= search_window.y + search_window.size_y and search_window_id + 1 != current_appslot and not search_window.hidden and not(mouse_x >= current_window.x and mouse_x <= current_window.x +current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + current_window.size_y):
+                        if mouse_x >= search_window.x and mouse_x <= search_window.x + search_window.size_x and mouse_y >= search_window.y and mouse_y <= search_window.y + search_window.size_y and search_window_id + 1 != current_appslot and not search_window.hidden and not(mouse_x >= current_window.x and mouse_x <= current_window.x +current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + current_window.size_y and window_moving):
                             current_window = search_window
                             current_appslot = search_window_id + 1
                             current_object = -1
@@ -345,11 +350,19 @@ while is_working:
             cannot_reselect = False
     clock.tick(30)
     tick += 1
+    crt_tick += 3
+    if not window_moving:
+        window_indent = -1
+    if crt_tick >= win_size[1] +30:
+        crt_tick = -31
     if tick == 31:
         tick = 0
         cycle += 1
+    if window_moving:
+        current_window.x = int(mouse_x - current_window.size_x/2)
+        current_window.y = mouse_y - 17        
     if cycle == 0 and tick == 1 and mode == "startup":
-        appslot1 = Window(window, win_size[1], VERSION_NAMED, 150, 50, [["label", "Booting up...", 50, 80, 100, 50]], 300, 170, False, True, False)
+        appslot1 = Window(window, win_size[1], VERSION_NAMED, int((win_size[0]-300)/2), int((win_size[1]-170)/2), [["label", "Booting up...", 50, 80, 100, 50]], 300, 170, False, True, False)
         appslot1.hidden = False
         current_window = appslot1
         busy = True
@@ -361,7 +374,7 @@ while is_working:
             tick = 0
         elif mode == "startup":
             mode = "work"
-            appslot1 = Window(window, win_size[1], "fFiles " + VERSION, 10, 10, [["checkbox",False,190,204,15,15]], 300, 235, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0],["label","Delete:",120,200,0,0]]\nself.functions = [['',''],["",""]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(100*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(100*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',' '))\nself.objects.append(('label','/',75,200,20,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(( 'os.chdir("..")',''))\nself.objects.append(('label','Root:'+str(path[len(disk_root):]),10,213,20,20))\nself.functions.append(('',''))""", ""))
+            appslot1 = Window(window, win_size[1], "fFiles " + VERSION, 10, 10, [["checkbox",False,190,204,15,15]], 300, 235, True, True, False, [["", ""]], ("""indent_x = 0\nindent_y = 0\nfiles = os.listdir()\nself.objects = [self.objects[0],["label","Delete:",120,200,0,0]]\nself.functions = [['',''],["",""]]\nfor file_id in range(len(files)):\n    if file_id % 10 == 0 and file_id != 0:\n        indent_x +=1\n        indent_y = 0\n    file = files[file_id]\n    if len(file) >= 14:\n        file = file[:3]+'~'+file[-5:]\n    if os.path.isdir(files[file_id]):\n        self.objects.append(('label','['+str(file)+']',10+(140*indent_x),40+(15*indent_y),len('['+str(file)+']')*10,20))\n    else:\n        self.objects.append(('label',file,10+(140*indent_x),40+(15*indent_y),len(str(file))*10,20))\n    if self.objects[0][1] and os.path.isdir(files[file_id]):\n      self.functions.append(("shutil.rmtree('"+files[file_id]+"')",""))\n    if self.objects[0][1]:\n      self.functions.append(("os.remove('"+files[file_id]+"')",""))\n    elif file[-5:] == '.exec':\n        self.functions.append(('fetch '+str(files[file_id]),''))\n    elif os.path.isdir(files[file_id]):\n        self.functions.append(('os.chdir("'+path+str(files[file_id])+'")',''))\n    else:\n        self.functions.append(('',''))\n    indent_y +=1\nself.objects.append(('label','Go to:',10,200,60,20))\nself.functions.append(('',' '))\nself.objects.append(('label','/',75,200,20,20))\nself.functions.append(('os.chdir(disk_root)',''))\nif os.getcwd() != disk_root:\n    self.objects.append(('label','..',90,200,20,20))\n    self.functions.append(( 'os.chdir("..")',''))\nself.objects.append(('label','Root:'+str(path[len(disk_root):]),10,213,20,20))\nself.functions.append(('',''))""", ""))
             appslot1.hidden = False
             appslot1.hidden_x = 40
             current_window = appslot1
@@ -372,12 +385,12 @@ while is_working:
             appslot1 = ""
             current_window = appslot1
     if cycle == 0 and tick == 1 and mode == "shutdown":
-        appslot1 = Window(window, win_size[1], VERSION_NAMED, 150, 50, [["label", "Shutting down...", 50, 80, 100, 50]], 300, 170, False, True, False)
+        appslot1 = Window(window, win_size[1], VERSION_NAMED, int((win_size[0]-300)/2), int((win_size[1]-170)/2),[["label", "Shutting down...", 50, 80, 100, 50]], 300, 170, False, True, False)
         appslot1.hidden = False
         current_window = appslot1
         busy = True
     elif cycle == 0 and tick == 1 and mode == "reboot":
-        appslot1 = Window(window, win_size[1], VERSION_NAMED, 150, 50, [["label", "Rebooting...", 50, 80, 100, 50]], 300, 170, False, True, False)
+        appslot1 = Window(window, win_size[1], VERSION_NAMED, int((win_size[0]-300)/2), int((win_size[1]-170)/2), [["label", "Rebooting...", 50, 80, 100, 50]], 300, 170, False, True, False)
         appslot1.hidden = False
         current_window = appslot1
         busy = True
@@ -385,9 +398,14 @@ while is_working:
         mode = "startup"
         cycle = 0
         tick = 0
-    window.fill(BLACK)
+    window.fill((1,130,129))
     if mode != "blackscreen":
-        fill_background(path_background, win_size[0], win_size[1], window)
+        if display_prefs[2]:fill_background(str(path_folder+display_prefs[1]), win_size[0], win_size[1], window)
+        else:
+            try:
+                image_gui_background = pg.image.load(path_folder+display_prefs[1])
+                window.blit(pg.transform.scale(image_gui_background, win_size), (0,0))
+            except:pass
     apps = [appslot1, appslot2, appslot3, appslot4]
     for selected_window in apps:
         try:
@@ -410,7 +428,7 @@ while is_working:
                 appbuttons.append(["button", "4 "+appslot4.title[:9], 420, 2, 110, 25])
             appbuttons = [["label", "FinalStep", 5, 5, 100, 50],["label", VERSION, 3, 20, 100, 50],["button", "Reboot", win_size[0]-90, 2, 90, 25],["button", "Shutdown", win_size[0]-90, 27, 90, 25]]+appbuttons
             appfunctions = [[],[],["""cycle = 0\ntick = 0\nmode = "reboot"\nappslot2 = ""\nappslot3 = ""\nappslot4 = "" """,""],["""cycle = 0\ntick = 0\nmode = "shutdown"\nappslot2 = ""\nappslot3 = ""\nappslot4 = "" """,""]]
-            dock_window = Window(window, win_size[1], "", 0, 250, appbuttons, win_size[0], 50, False, False, False,appfunctions,("",""),LIGHTGRAY,False)
+            dock_window = Window(window, win_size[1], "", 0, win_size[1]-50, appbuttons, win_size[0], 50, False, False, False,appfunctions,("",""),LIGHTGRAY,False)
             dock_window.redraw()            
     try:
         if dock_hidden and current_window.hidden:
@@ -425,10 +443,11 @@ while is_working:
             if platform.system() != "Windows":
                 path_cursor = path_folder + "/gui/cursor_move.png"
             else:
-                path_cursor = path_folder + "\\gui\\cursor_move.png"
+                path_cursor = path_folder + "/gui/cursor_move.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
-            window_moving = False 
+            if not clicked:
+                window_moving = False  
         elif busy:
             if tick <= 30 and tick >= 21:
                 if platform.system() != "Windows":
@@ -458,4 +477,7 @@ while is_working:
                 path_cursor = path_folder + "/gui/cursor.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
+    if display_prefs[0]:
+        window.blit(pg.transform.scale(crt_overlay2, win_size), (0, 0))
+        window.blit(pg.transform.scale(crt_overlay1, (win_size[0],30)), (0, crt_tick))        
     pg.display.update()
