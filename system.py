@@ -237,7 +237,10 @@ while is_working:
             mouse_x = pos[0]
             mouse_y = pos[1]
             cannot_reselect = False
-            button_size_x = (win_size[0] - 190) /len(apps)
+            if len(apps) >= 5:
+                button_size_x = (win_size[0] - 190) /len(apps)
+            else:
+                button_size_x = (win_size[0] - 190) /4
             if mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
                 cycle = 0
                 tick = 0
@@ -257,37 +260,37 @@ while is_working:
                 current_window = apps[0]
                 current_object = ""
                 apps[0].hidden = False
-            elif mouse_x >= 90 +button_size_x and mouse_x <= 90 +(button_size_x*2) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[1] != "":
+            elif mouse_x >= 90 +button_size_x and mouse_x <= 90 +(button_size_x*2) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 2:
                 current_appslot = 1
                 current_window = apps[1]
                 current_object = ""
                 apps[1].hidden = False
-            elif mouse_x >= 90 +(button_size_x*2) and mouse_x <= 90 +(button_size_x*3) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[2] != "":
+            elif mouse_x >= 90 +(button_size_x*2) and mouse_x <= 90 +(button_size_x*3) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 3:
                 current_appslot = 2
                 current_window = apps[2]
                 current_object = ""
                 apps[2].hidden = False
-            elif mouse_x >= 90 +(button_size_x*3) and mouse_x <= 90 +(button_size_x*4) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[3] != "":
+            elif mouse_x >= 90 +(button_size_x*3) and mouse_x <= 90 +(button_size_x*4) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 4:
                 current_appslot = 3
                 current_window = apps[3]
                 current_object = ""
                 apps[3].hidden = False
-            elif mouse_x >= 90 +(button_size_x*4) and mouse_x <= 90 +(button_size_x*5) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[3] != "":
+            elif mouse_x >= 90 +(button_size_x*4) and mouse_x <= 90 +(button_size_x*5) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 5:
                 current_appslot = 4
                 current_window = apps[4]
                 current_object = ""
                 apps[4].hidden = False
-            elif mouse_x >= 90 +(button_size_x*5) and mouse_x <= 90 +(button_size_x*6) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[3] != "":
+            elif mouse_x >= 90 +(button_size_x*5) and mouse_x <= 90 +(button_size_x*6) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 6:
                 current_appslot = 5
                 current_window = apps[5]
                 current_object = ""
                 apps[5].hidden = False
-            elif mouse_x >= 90 +(button_size_x*6) and mouse_x <= 90 +(button_size_x*7) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[3] != "":
+            elif mouse_x >= 90 +(button_size_x*6) and mouse_x <= 90 +(button_size_x*7) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 7:
                 current_appslot = 6
                 current_window = apps[6]
                 current_object = ""
                 apps[6].hidden = False
-            elif mouse_x >= 90 +(button_size_x*7) and mouse_x <= 90 +(button_size_x*8) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and apps[3] != "":
+            elif mouse_x >= 90 +(button_size_x*7) and mouse_x <= 90 +(button_size_x*8) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 8:
                 current_appslot = 7
                 current_window = apps[7]
                 current_object = ""
@@ -414,7 +417,10 @@ while is_working:
             pass
     if mode == "work":
         appbuttons = []
-        button_size_x = (win_size[0] - 190) /len(apps)
+        if len(apps) >= 5:
+            button_size_x = (win_size[0] - 190) /len(apps)
+        else:
+            button_size_x = (win_size[0] - 190) /4
         for app_id in range(len(apps)):
             try:
                 appslot = apps[app_id]
