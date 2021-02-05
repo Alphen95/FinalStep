@@ -331,7 +331,7 @@ while is_working:
                 apps.pop(current_appslot)
                 current_appslot = 0
                 current_window = apps[0]
-            elif mouse_x >= current_window.x and mouse_x <= current_window.x + current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + 40 and not busy and not(mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32):
+            elif mouse_x >= current_window.x and mouse_x <= current_window.x + current_window.size_x and mouse_y >= current_window.y and mouse_y <= current_window.y + 40 and not busy and not(mouse_x >= current_window.x + 2 and mouse_x <= current_window.x + 32 and mouse_y >= current_window.y + 2 and mouse_y <= current_window.y + 32) and not current_window.hidden:
                 window_moving = True
             if not cannot_reselect:
                 for search_window_id in range(len(apps)):
