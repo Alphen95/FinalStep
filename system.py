@@ -431,8 +431,7 @@ while is_working:
                 appbuttons.append(button)
             except:pass
         appbuttons = [["label", "FinalStep", 5, 5, 100, 50],["label", VERSION, 3, 20, 100, 50],["button", "Reboot", win_size[0]-90, 2, 90, 25],["button", "Shutdown", win_size[0]-90, 27, 90, 25]]+appbuttons
-        appfunctions = [[],[],["""cycle = 0\ntick = 0\nmode = "reboot"\nappslot2 = ""\nappslot3 = ""\nappslot4 = "" """,""],["""cycle = 0\ntick = 0\nmode = "shutdown"\nappslot2 = ""\nappslot3 = ""\nappslot4 = "" """,""]]
-        dock_window = Window(window, win_size[1], "", 0, win_size[1]-50, appbuttons, win_size[0], 50, False, False, False,appfunctions,("",""),LIGHTGRAY,False)
+        dock_window = Window(window, win_size[1], "", 0, win_size[1]-50, appbuttons, win_size[0], 50, False, False, False,[],("",""),LIGHTGRAY,False)
         dock_window.redraw()            
     try:
         if current_window.hidden:
