@@ -74,8 +74,7 @@ class Window:
                 pg.draw.line(win, BLACK, [self.x + self.size_x - 2, self.y + self.size_y - 2], [self.x + 2, self.y + self.size_y - 2], 5)
                 pg.draw.line(win, BLACK, [self.x + 2, self.y + 2], [self.x + 2, self.y + self.size_y], 5)                
             if self.on_refresh != ():
-                for action in self.on_refresh:
-                    exec(action)
+                for action in self.on_refresh:exec(action)
             for obj in self.objects:
                 if obj[0] == "button":
                     pg.draw.rect(win, DARKGRAY, (obj[2] + self.x, obj[3] + self.y, obj[4], obj[5]))
@@ -100,8 +99,7 @@ class Window:
                     if obj[1]:
                         pg.draw.line(win, BLACK, [obj[2] + self.x +4, obj[3] + self.y +7], [obj[2] + self.x + 8,obj[3] + self.y + 10], 3)
                         pg.draw.line(win, BLACK, [obj[2] + self.x + 8,obj[3] + self.y + 10], [obj[2] + self.x + 11,obj[3] + self.y + 2], 3)
-                elif obj[0] == "line":
-                    pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y], [obj[4]+ self.x, obj[5]+ self.y], 3)
+                elif obj[0] == "line":pg.draw.line(win, BLACK, [obj[2] + self.x, obj[3] + self.y], [obj[4]+ self.x, obj[5]+ self.y], 3)
                 elif obj[0] == "image":
                     image_gui = pg.image.load(path_folder+obj[1])
                     win.blit(pg.transform.scale(image_gui, (obj[4], obj[5])), (self.x+obj[2], self.y+obj[3]))
@@ -114,26 +112,19 @@ class Window:
                     lines_amount = int((obj[5] - 5) / 10)
                     try:
                         line_num = 0
-                        if int(line) - 1 == -1:
-                            add = 1
-                        else:
-                            add = 0
+                        if int(line) - 1 == -1:add = 1
+                        else:add = 0
                         for line_id in range(int(line) - 1 + add, int(line) + lines_amount - 1 + add):
                             line_text = textfield_lines[line_id]
-                            if line_id == line:
-                                object_text = font.render("\u2192" + str(line_text), 1, BLACK)
-                            else:
-                                object_text = font.render(" " + str(line_text), 1, BLACK)
+                            if line_id == line:object_text = font.render("\u2192" + str(line_text), 1, BLACK)
+                            else:object_text = font.render(" " + str(line_text), 1, BLACK)
                             win.blit(object_text, [obj[2] + 10 + self.x, obj[3] + 4 + self.y + (10 * line_num)])
                             line_num += 1
-                    except:
-                        pass
+                    except:pass
             if self.has_titlebar:
                 pg.draw.rect(win, LIGHTGRAY, (self.x, self.y, self.size_x + 1, 35))
-                if self.closable:
-                    win.blit(pg.transform.scale(gui_button_close, (30, 30)), (self.size_x + self.x - 32, self.y + 2))
-                if self.hidable:
-                    win.blit(pg.transform.scale(gui_button_hide, (30, 30)), (self.x + 2, self.y + 2))                
+                if self.closable:win.blit(pg.transform.scale(gui_button_close, (30, 30)), (self.size_x + self.x - 32, self.y + 2))
+                if self.hidable:win.blit(pg.transform.scale(gui_button_hide, (30, 30)), (self.x + 2, self.y + 2))                
                 window_title = font.render(str(self.title), 1, WHITE)
                 win.blit(window_title, [self.x + 36, self.y + 10])
 
@@ -144,21 +135,17 @@ def fill_background(path_image, window_x, window_y, window_object):
     try:
         image_gui_background = pg.image.load(path_image)
         for i in range(0, iter1):
-            for i1 in range(0, iter2):
-                window_object.blit(pg.transform.scale(image_gui_background, (60, 60)), (60 * i, 60 * i1))
+            for i1 in range(0, iter2):window_object.blit(pg.transform.scale(image_gui_background, (60, 60)), (60 * i, 60 * i1))
     except: pass
 
 
 def fetchapp(filename):
     path_app = os.getcwd() + filename
-    with open(path_app, mode="r") as app_file:
-        window_arguments = json.loads(app_file.read())
+    with open(path_app, mode="r") as app_file:window_arguments = json.loads(app_file.read())
     args_fixed = []
     for i in range(0, 13):
-        try:
-            args_fixed.append(window_arguments[i])
-        except:
-            args_fixed.append(None)
+        try:args_fixed.append(window_arguments[i])
+        except:args_fixed.append(None)
     return window, win_size[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12]
 
 
@@ -173,11 +160,9 @@ starting_up = True
 crt_overlay1= pg.image.load(path_overlay1)
 crt_overlay2= pg.image.load(path_overlay2)
 try:
-    with open("preferences.json",mode="r") as file:
-        display_prefs = json.loads(file.read())
+    with open("preferences.json",mode="r") as file:display_prefs = json.loads(file.read())
 except:
-    with open("preferences.json",mode="w+") as file:
-        file.write(json.dumps(display_prefs))
+    with open("preferences.json",mode="w+") as file:file.write(json.dumps(display_prefs))
 
 while is_working:
     pos = pg.mouse.get_pos()
@@ -188,51 +173,41 @@ while is_working:
     for event in pg.event.get():
         if event.type == pg.MOUSEBUTTONDOWN and pg.mouse.get_focused(): clicked = True
         elif event.type == pg.MOUSEBUTTONUP: clicked = False
-        if event.type == pg.QUIT:
-            is_working = False
+        if event.type == pg.QUIT:is_working = False
         elif event.type == pg.KEYDOWN:
             if current_object != "":
                 if current_window.objects[current_object][0] == "textbox":
-                    if current_object != -1 and event.key == pg.K_BACKSPACE or current_object != -1 and event.key == pg.K_DELETE:
-                        current_window.objects[current_object][1] = current_window.objects[current_object][1][:-1]
-                    elif current_object != -1 and event.key == pg.K_ESCAPE:
-                        current_object = -1
-                    elif current_object != -1:
-                        current_window.objects[current_object][1] += event.unicode
+                    if current_object != -1 and event.key == pg.K_BACKSPACE or current_object != -1 and event.key == pg.K_DELETE:current_window.objects[current_object][1] = current_window.objects[current_object][1][:-1]
+                    elif current_object != -1 and event.key == pg.K_ESCAPE:current_object = -1
+                    elif current_object != -1:current_window.objects[current_object][1] += event.unicode
                 elif current_window.objects[current_object][0] == "textfield":
                     line = current_window.objects[current_object][-1]
                     if current_object != "" and event.key == pg.K_BACKSPACE or current_object != "" and event.key == pg.K_DELETE:
                         try:
-                            if current_window.objects[current_object][1][int(line)] != "":
-                                current_window.objects[current_object][1][int(line)] = current_window.objects[current_object][1][int(line)][:-1]
+                            if current_window.objects[current_object][1][int(line)] != "": current_window.objects[current_object][1][int(line)] = current_window.objects[current_object][1][int(line)][:-1]
                             else:
                                 if line != 0:
                                     current_window.objects[current_object][1].pop(int(line))
                                     line -= 1
                                     current_window.objects[current_object][6] = line
 
-                        except:
-                            pass
+                        except:pass
                     elif current_object != "" and event.key == pg.K_DOWN:
                         try:
                             if current_window.objects[current_object][1][int(line)] != current_window.objects[current_object][1][-1]:
                                 line += 1
                                 current_window.objects[current_object][6] = line
-                        except:
-                            pass
+                        except:pass
                     elif current_object != "" and event.key == pg.K_UP:
                         if line != 0:
                             line -= 1
                             current_window.objects[current_object][6] = line
-                    elif current_object != "" and event.key == pg.K_ESCAPE:
-                        current_object = ""
+                    elif current_object != "" and event.key == pg.K_ESCAPE:current_object = ""
                     elif current_object != "" and event.key == pg.K_RETURN:
                         line += 1
                         current_window.objects[current_object][1].insert(line, "")
-
                         current_window.objects[current_object][6] = line
-                    elif current_object != "":
-                        current_window.objects[current_object][1][int(line)] += event.unicode
+                    elif current_object != "":current_window.objects[current_object][1][int(line)] += event.unicode
         elif clicked:
             mouse_x = pos[0]
             mouse_y = pos[1]
@@ -245,56 +220,17 @@ while is_working:
                 cycle = 0
                 tick = 0
                 mode = "reboot"
-                appslot2 = ""
-                appslot3 = ""
-                appslot4 = ""
             elif mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-25 and mouse_y <= win_size[1] and mode == "work":
                 cycle = 0
                 tick = 0
                 mode = "shutdown"
-                appslot2 = ""
-                appslot3 = ""
-                appslot4 = ""
-            elif mouse_x >= 90 and mouse_x <= 90 +button_size_x and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
-                current_appslot = 0
-                current_window = apps[0]
-                current_object = ""
-                apps[0].hidden = False
-            elif mouse_x >= 90 +button_size_x and mouse_x <= 90 +(button_size_x*2) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 2:
-                current_appslot = 1
-                current_window = apps[1]
-                current_object = ""
-                apps[1].hidden = False
-            elif mouse_x >= 90 +(button_size_x*2) and mouse_x <= 90 +(button_size_x*3) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 3:
-                current_appslot = 2
-                current_window = apps[2]
-                current_object = ""
-                apps[2].hidden = False
-            elif mouse_x >= 90 +(button_size_x*3) and mouse_x <= 90 +(button_size_x*4) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 4:
-                current_appslot = 3
-                current_window = apps[3]
-                current_object = ""
-                apps[3].hidden = False
-            elif mouse_x >= 90 +(button_size_x*4) and mouse_x <= 90 +(button_size_x*5) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 5:
-                current_appslot = 4
-                current_window = apps[4]
-                current_object = ""
-                apps[4].hidden = False
-            elif mouse_x >= 90 +(button_size_x*5) and mouse_x <= 90 +(button_size_x*6) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 6:
-                current_appslot = 5
-                current_window = apps[5]
-                current_object = ""
-                apps[5].hidden = False
-            elif mouse_x >= 90 +(button_size_x*6) and mouse_x <= 90 +(button_size_x*7) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 7:
-                current_appslot = 6
-                current_window = apps[6]
-                current_object = ""
-                apps[6].hidden = False
-            elif mouse_x >= 90 +(button_size_x*7) and mouse_x <= 90 +(button_size_x*8) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work" and len(apps) >= 8:
-                current_appslot = 7
-                current_window = apps[7]
-                current_object = ""
-                apps[7].hidden = False
+            else:
+                for program_id in range(len(apps)+1):
+                    if mouse_x >= 90+(button_size_x*(program_id-1)) and mouse_x <= int(90 +(button_size_x*program_id)) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
+                        current_appslot = program_id-1
+                        current_window = apps[program_id-1]
+                        current_object = ""
+                        apps[program_id-1].hidden = False                
             if not current_window.hidden:
                 for obj_id in range(len(current_window.objects)):
                     obj = current_window.objects[obj_id]
@@ -311,7 +247,7 @@ while is_working:
                                         args_fixed = fetchapp("/" + funct[6:])
                                     else:
                                         args_fixed = fetchapp("\\" + funct[6:])
-                                    if len(apps) != 8:
+                                    if len(apps) != -1:
                                         apps.append(Window(args_fixed[0], args_fixed[1], args_fixed[2], args_fixed[3], args_fixed[4], args_fixed[5], args_fixed[6], args_fixed[7], args_fixed[8], args_fixed[9], args_fixed[10], args_fixed[11],args_fixed[12]))
                                         current_appslot = len(apps)-1
                                         current_window = apps[-1]
@@ -443,41 +379,26 @@ while is_working:
     if pg.mouse.get_focused():
         pos = pg.mouse.get_pos()
         if window_moving:
-            if platform.system() != "Windows":
-                path_cursor = path_folder + "/gui/cursor_move.png"
-            else:
-                path_cursor = path_folder + "/gui/cursor_move.png"
+            path_cursor = path_folder + "/gui/cursor_move.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             if not clicked:
                 window_moving = False  
         elif busy:
             if tick <= 30 and tick >= 21:
-                if platform.system() != "Windows":
-                    path_cursor = path_folder + "/gui/cursor_busy2.png"
-                else:
-                    path_cursor = path_folder + "/gui/cursor_busy2.png"
+                path_cursor = path_folder + "/gui/cursor_busy2.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             elif tick <= 20 and tick >= 11:
-                if platform.system() != "Windows":
-                    path_cursor = path_folder + "/gui/cursor_busy1.png"
-                else:
-                    path_cursor = path_folder + "/gui/cursor_busy1.png"
+                path_cursor = path_folder + "/gui/cursor_busy1.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
             else:
-                if platform.system() != "Windows":
-                    path_cursor = path_folder + "/gui/cursor_busy0.png"
-                else:
-                    path_cursor = path_folder + "/gui/cursor_busy0.png"
+                path_cursor = path_folder + "/gui/cursor_busy0.png"
                 gui_cursor = pg.image.load(path_cursor)
                 window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
         else:
-            if platform.system() != "Windows":
-                path_cursor = path_folder + "/gui/cursor.png"
-            else:
-                path_cursor = path_folder + "/gui/cursor.png"
+            path_cursor = path_folder + "/gui/cursor.png"
             gui_cursor = pg.image.load(path_cursor)
             window.blit(gui_cursor, (pos[0] - 10, pos[1] - 10))
     if display_prefs[0]:
