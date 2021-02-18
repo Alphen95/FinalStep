@@ -220,10 +220,12 @@ while is_working:
                 cycle = 0
                 tick = 0
                 mode = "reboot"
+                apps = [apps[0]]
             elif mouse_x >= win_size[0] - 90 and mouse_x <= win_size[0] and mouse_y >= win_size[1]-25 and mouse_y <= win_size[1] and mode == "work":
                 cycle = 0
                 tick = 0
                 mode = "shutdown"
+                apps = [apps[0]]
             else:
                 for program_id in range(len(apps)+1):
                     if mouse_x >= 90+(button_size_x*(program_id-1)) and mouse_x <= int(90 +(button_size_x*program_id)) and mouse_y >= win_size[1]-50 and mouse_y <= win_size[1]-25 and mode == "work":
@@ -324,25 +326,27 @@ while is_working:
         apps[0] = Window(window, win_size[1], VERSION_NAMED, int((win_size[0]-300)/2), int((win_size[1]-170)/2),[["label", "Shutting down...", 50, 80, 100, 50]], 300, 170, False, True, False)
         current_window = apps[0]
         busy = True
-        current_appslot = 1
+        current_appslot = 0
     elif cycle == 0 and tick == 1 and mode == "reboot":
         apps[0] =  Window(window, win_size[1], VERSION_NAMED, int((win_size[0]-300)/2), int((win_size[1]-170)/2), [["label", "Rebooting...", 50, 80, 100, 50]], 300, 170, False, True, False)
         current_window = apps[0]
         busy = True
-        current_appslot = 1
+        current_appslot = 0
     elif cycle == 1 and mode == "blackscreen":
         mode = "startup"
         cycle = 0
         tick = 0
-        current_appslot = 1
-    window.fill((1,130,129))
+        current_appslot = 0
     if mode != "blackscreen":
+        window.fill((1,130,129))
         if display_prefs[2]:fill_background(str(path_folder+display_prefs[1]), win_size[0], win_size[1], window)
         else:
             try:
                 image_gui_background = pg.image.load(path_folder+display_prefs[1])
                 window.blit(pg.transform.scale(image_gui_background, win_size), (0,0))
             except:pass
+    else:
+        window.fill((0,0,0))
     for selected_window in apps:
         try:
             if selected_window.hidden:
